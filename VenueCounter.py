@@ -3,7 +3,6 @@
 
 import pandas as pd
 import argparse
-from tqdm import tqdm
 
 class VenueCounter:
     def __init__(self, csv_file_path):
@@ -25,21 +24,25 @@ class VenueCounter:
         comma_rows = comma_rows.copy()
         comma_rows[['issn1', 'issn2']] = comma_rows['cited_issn'].str.split(',', expand=True)
 
-        grouped_comma = comma_rows.groupby(['issn1', 'issn2'])['cited_venue'].agg(
-            count='size', 
-            cited_venue=lambda x: ', '.join(set(x))
-        ).reset_index()
+        grouped_comma = comma_rows.groupby(['issn1', 'issn2', 'cited_venue']).size().reset_index(name='count')
 
         # Processare le righe senza la virgola
         no_comma_rows = df[~df['cited_issn'].str.contains(',')]
-        no_comma_groups = no_comma_rows.groupby('cited_issn')['cited_venue'].agg(
-            count='size', 
-            cited_venue=lambda x: ', '.join(set(x))
-        ).reset_index().rename(columns={'cited_issn': 'issn1'})
+        no_comma_groups = no_comma_rows.groupby(['cited_issn', 'cited_venue']).size().reset_index(name='count')
+        no_comma_groups = no_comma_groups.rename(columns={'cited_issn': 'issn1'})
         no_comma_groups['issn2'] = None
 
+        # Gestire le righe con cited_issn vuoto
+        empty_issn_rows = df[df['cited_issn'] == '']
+        empty_issn_groups = empty_issn_rows.groupby('cited_venue').size().reset_index(name='count')
+        empty_issn_groups['issn1'] = ''
+        empty_issn_groups['issn2'] = None
+
         # Concatenare i risultati
-        final_group = pd.concat([grouped_comma, no_comma_groups], ignore_index=True)
+        final_group = pd.concat([grouped_comma, no_comma_groups, empty_issn_groups], ignore_index=True)
+
+        # Rimuovere i duplicati
+        final_group = final_group.drop_duplicates()
 
         # Restituire il DataFrame finale
         return final_group
