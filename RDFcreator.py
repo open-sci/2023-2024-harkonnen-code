@@ -1,7 +1,3 @@
-# DA TERMINALE: 
-# python RDFcreator.py --input combined_total_delta_dir.csv --output PROVA.ttl --baseurl https://w3id.org/oc/index/coci/ --data --populate_data
-# python RDFcreator.py --input combined_total_delta_dir.csv --output PROVA.ttl --baseurl https://w3id.org/oc/index/coci/ --prov --populate_prov
-
 from rdflib import Graph, RDF, RDFS, XSD, URIRef, Literal
 from dateutil.relativedelta import relativedelta
 from dateutil.parser import parse
@@ -11,7 +7,7 @@ from io import StringIO
 from urllib.parse import quote
 import os
 import errno
-from argparse import ArgumentParser
+import argparse
 
 class PeerReview(object):
     # predicates citation
@@ -31,12 +27,12 @@ class PeerReview(object):
     _generated_at_time = URIRef(__prov_base + "generatedAtTime")
 
     # init
-    def __init__(self, oci, citing_url=None, cited_url=None, timespan=None, citing_date=None, prov_agent_url=None, source=None, prov_date=None):
+    def __init__(self, oci, citing_url=None, cited_url=None, time_span=None, citing_date=None, prov_agent_url=None, source=None, prov_date=None):
         self.oci = oci[4:]
         self.citing_url = citing_url
         self.citing_date = citing_date
         self.cited_url = cited_url
-        self.timespan = timespan
+        self.time_span = time_span
         self.prov_agent_url = prov_agent_url
         self.source = source
         self.prov_date = prov_date
@@ -68,9 +64,9 @@ class PeerReview(object):
 
                 peer_review_graph.add((citation, self._has_citation_creation_date,
                                     Literal(self.citing_date, datatype=xsd_type, normalize=False)))
-                if self.timespan is not None:
+                if self.time_span is not None:
                     peer_review_graph.add((citation, self._has_citation_time_span,
-                                        Literal(self.timespan, datatype=XSD.duration)))
+                                        Literal(self.time_span, datatype=XSD.duration)))
 
         if include_prov:
             if self.prov_agent_url:
@@ -102,12 +98,12 @@ def populate_data(csv_file, output_file, base_url, include_data=True, include_pr
             citing_url = row['citing_url'] 
             cited_url = row['cited_url']
             citing_date = row['citing_date'] 
-            timespan = row['timespan']
+            time_span = row['time_span']
 
             citation = PeerReview(oci,
                                   citing_url=citing_url,
                                   cited_url=cited_url,
-                                  timespan=timespan,
+                                  time_span=time_span,
                                   citing_date=citing_date)
 
             g = citation.get_peer_review_rdf(base_url, include_data=include_data, include_prov=include_prov)
@@ -137,24 +133,24 @@ def populate_prov(csv_file, output_file, base_url, include_data=False, include_p
         with open(output_file, 'a', newline='') as f:
             f.write(block_txt)
 
-def from_terminal():
-    parser = ArgumentParser(description='Process some integers.')
-    parser.add_argument('--input', type=str, help='Input CSV file', required=True)
-    parser.add_argument('--output', type=str, help='Output file', required=True)
-    parser.add_argument('--baseurl', type=str, help='Base URL', required=True)
-    parser.add_argument('--data', dest='include_data', action='store_true', help='Include data')
-    parser.add_argument('--prov', dest='include_prov', action='store_true', help='Include provenance')
-    parser.add_argument('--populate_data', dest='populate_data', action='store_true', help='Populate data')
-    parser.add_argument('--populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
+# def main():
+#     parser = argparse.ArgumentParser(description='Process some integers.')
+#     parser.add_argument('--input', type=str, help='Input CSV file', required=True)
+#     parser.add_argument('--output', type=str, help='Output file', required=True)
+#     parser.add_argument('--baseurl', type=str, help='Base URL', required=True)
+#     parser.add_argument('--data', dest='include_data', action='store_true', help='Include data')
+#     parser.add_argument('--prov', dest='include_prov', action='store_true', help='Include provenance')
+#     parser.add_argument('--populate_data', dest='populate_data', action='store_true', help='Populate data')
+#     parser.add_argument('--populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
 
-    args = parser.parse_args()
+#     args = parser.parse_args()
 
-    if args.populate_data:
-        populate_data(args.input, args.output, args.baseurl, include_data=args.include_data, include_prov=False)
-    elif args.populate_prov:
-        populate_prov(args.input, args.output, args.baseurl, include_data=args.include_data, include_prov=args.include_prov)
-    else:
-        print("No action specified. Use --populate_data or --populate_prov.")
+#     if args.populate_data:
+#         populate_data(args.input, args.output, args.baseurl, include_data=args.include_data, include_prov=False)
+#     elif args.populate_prov:
+#         populate_prov(args.input, args.output, args.baseurl, include_data=args.include_data, include_prov=args.include_prov)
+#     else:
+#         print("No action specified. Use --populate_data or --populate_prov.")
 
-if __name__ == "__main__":
-    from_terminal()
+# if __name__ == "__main__":
+#     main()
