@@ -28,6 +28,31 @@ from VenueCounter import VenueCounter
 from MetaAnalysis import MetaAnalysis
 
 # Example of usage
+# python run.py \
+#     --zip_filename input_zip_file.zip \
+#     --peer_output_filenames peer_output_1.csv peer_output_2.csv \
+#     --peer_batch_size 10 \
+#     --peer_max_files 100 \
+#     --max_workers 4 \
+#     --non_peer_output_filenames non_peer_output_1.csv non_peer_output_2.csv \
+#     --non_peer_batch_size 10 \
+#     --non_peer_max_files 100 \
+#     --peer_review_dir peer_review_dir \
+#     --non_peer_review_dir non_peer_review_dir \
+#     --filter_output_path filter_output.csv \
+#     --compart_input_path compart_input_file.csv \
+#     --rdf_input rdf_input_file.csv \
+#     --rdf_output rdf_output.rdf \
+#     --baseurl http://example.org/ \
+#     --populate_data \
+#     --venue_csv_file venue_csv_file.csv \
+#     --top_n 10 \
+#     --venue_output_file venue_output.csv \
+#     --combined_csv combined_csv_file.csv \
+#     --meta_zip_file input_zip_file.zip \
+#     --mode all \
+#     --meta_output_file meta_output.csv
+
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Peer Reviews processor")
