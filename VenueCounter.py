@@ -46,17 +46,17 @@ class VenueCounter:
         grouped_df_comma.to_csv(output_file_path, index=False)
         print(f"Results saved to {output_file_path}")
 
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(description="Venue Counter")
-#     parser.add_argument('csv_file', help='Path to the input CSV file')
-#     parser.add_argument('--top_n', type=int, default=10, help='Number of top venues to display')
-#     parser.add_argument('--output_file', help='Path to the output CSV file to save results')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Venue Counter")
+    parser.add_argument('venue_csv_file', help='Path to the input CSV file')
+    parser.add_argument('--venue_top_n', type=int, default=10, help='Number of top venues to display')
+    parser.add_argument('--venue_output_file', help='Path to the output CSV file to save results')
 
-#     args = parser.parse_args()
-#     counter = VenueCounter(args.csv_file)
-#     top_venues = counter.get_top_venues(args.top_n)
-#     print(f"Top {args.top_n} venues:")
-#     print(top_venues)
+    args = parser.parse_args()
+    counter = VenueCounter(args.venue_csv_file)
+    top_venues = counter.get_top_venues(args.venue_top_n)
+    print(f"Top {args.venue_top_n} venues:")
+    print(top_venues)
 
-#     if args.output_file:
-#         counter.save_to_csv(args.output_file)
+    if args.venue_output_file:
+        counter.save_to_csv(args.venue_output_file)

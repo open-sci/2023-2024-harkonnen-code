@@ -133,24 +133,24 @@ def populate_prov(csv_file, output_file, base_url, include_data=False, include_p
         with open(output_file, 'a', newline='') as f:
             f.write(block_txt)
 
-# def main():
-#     parser = argparse.ArgumentParser(description='Process some integers.')
-#     parser.add_argument('--input', type=str, help='Input CSV file', required=True)
-#     parser.add_argument('--output', type=str, help='Output file', required=True)
-#     parser.add_argument('--baseurl', type=str, help='Base URL', required=True)
-#     parser.add_argument('--data', dest='include_data', action='store_true', help='Include data')
-#     parser.add_argument('--prov', dest='include_prov', action='store_true', help='Include provenance')
-#     parser.add_argument('--populate_data', dest='populate_data', action='store_true', help='Populate data')
-#     parser.add_argument('--populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
+def main():
+    parser = argparse.ArgumentParser(description='Process some integers.')
+    parser.add_argument('--rdf_input', type=str, help='Input CSV file', required=True)
+    parser.add_argument('--rdf_output', type=str, help='Output file', required=True)
+    parser.add_argument('--rdf_baseurl', type=str, help='Base URL', required=True)
+    parser.add_argument('--rdf_data', dest='include_data', action='store_true', help='Include data')
+    parser.add_argument('--rdf_prov', dest='include_prov', action='store_true', help='Include provenance')
+    parser.add_argument('--rdf_populate_data', dest='populate_data', action='store_true', help='Populate data')
+    parser.add_argument('--rdf_populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
 
-#     args = parser.parse_args()
+    args = parser.parse_args()
 
-#     if args.populate_data:
-#         populate_data(args.input, args.output, args.baseurl, include_data=args.include_data, include_prov=False)
-#     elif args.populate_prov:
-#         populate_prov(args.input, args.output, args.baseurl, include_data=args.include_data, include_prov=args.include_prov)
-#     else:
-#         print("No action specified. Use --populate_data or --populate_prov.")
+    if args.rdf_populate_data:
+        populate_data(args.rdf_input, args.rdf_output, args.rdf_baseurl, include_data=args.rdf_include_data, include_prov=False)
+    elif args.rdf_populate_prov:
+        populate_prov(args.rdf_input, args.rdf_output, args.rdf_baseurl, include_data=args.rdf_include_data, include_prov=args.rdf_include_prov)
+    else:
+        print("No action specified. Use --populate_data or --populate_prov.")
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()

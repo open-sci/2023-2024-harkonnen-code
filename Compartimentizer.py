@@ -27,21 +27,24 @@ class Compartimentizer:
 
 
 
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(description="DataFrame Compartimentizer")
-#     parser.add_argument("input_path", help="Path to the input CSV file")
-#     args = parser.parse_args()
-#     columns_to_drop = ["cited_issn", "cited_venue", "prov_agent", "source", "prov_date"]
-#     columns_to_drop1 = ["citing_doi", "cited_doi", "citing_date", "cited_date", "citing_url", "cited_url", "cited_issn", "cited_venue", "cited_date", "time_span"]
-#     columns_to_drop2 = ["oci", "citing_doi", "citing_date", "cited_date", "citing_url", "cited_url", "cited_date", "time_span", "prov_agent", "source", "prov_date", "time_span"]
-#     output_path="Citation.csv",
-#     output_path1="Provenance.csv", 
-#     output_path2="Venue.csv"
-#     compartimentizer = Compartimentizer(columns_to_drop=columns_to_drop, 
-#                                         columns_to_drop1=columns_to_drop1, 
-#                                         columns_to_drop2=columns_to_drop2, 
-#                                         output_path=output_path,
-#                                         output_path1=output_path1, 
-#                                         output_path2=output_path2)
-#     print(f"Saving CSVs as {output_path}, {output_path1} and {output_path2}")
-#     compartimentizer.compartimentizer(args.input_path)
+def main():
+    parser = argparse.ArgumentParser(description="DataFrame Compartimentizer")
+    parser.add_argument("compart_input_path", help="Path to the input CSV file")
+    args = parser.parse_args()
+    columns_to_drop = ["cited_issn", "cited_venue", "prov_agent", "source", "prov_date"]
+    columns_to_drop1 = ["citing_doi", "cited_doi", "citing_date", "cited_date", "citing_url", "cited_url", "cited_issn", "cited_venue", "cited_date", "time_span"]
+    columns_to_drop2 = ["oci", "citing_doi", "citing_date", "cited_date", "citing_url", "cited_url", "cited_date", "time_span", "prov_agent", "source", "prov_date", "time_span"]
+    output_path="Citation.csv",
+    output_path1="Provenance.csv", 
+    output_path2="Venue.csv"
+    compartimentizer = Compartimentizer(columns_to_drop=columns_to_drop, 
+                                        columns_to_drop1=columns_to_drop1, 
+                                        columns_to_drop2=columns_to_drop2, 
+                                        output_path=output_path,
+                                        output_path1=output_path1, 
+                                        output_path2=output_path2)
+    print(f"Saving CSVs as {output_path}, {output_path1} and {output_path2}")
+    compartimentizer.compartimentizer(args.compart_input_path)
+
+if __name__ == "__main__":
+    main()

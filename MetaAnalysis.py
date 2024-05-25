@@ -78,26 +78,26 @@ class MetaAnalysis:
         df.to_csv(output_file_path, index=False)
         print(f"Counts saved to {output_file_path}")
 
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser(description="Meta Analysis")
-#     parser.add_argument('combined_csv', help='Path to the combined CSV file')
-#     parser.add_argument('zip_file', help='Path to the OpenAlex zip file')
-#     parser.add_argument('--mode', choices=['peer', 'article', 'all'], default='all', help='Mode of operation')
-#     parser.add_argument('--output_file', help='Path to the output CSV file to save counts')
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Meta Analysis")
+    parser.add_argument('meta_combined_csv', help='Path to the combined CSV file')
+    parser.add_argument('meta_zip_file', help='Path to the OpenAlex zip file')
+    parser.add_argument('--meta_mode', choices=['peer', 'article', 'all'], default='all', help='Mode of operation')
+    parser.add_argument('--meta_output_file', help='Path to the output CSV file to save counts')
 
-#     args = parser.parse_args()
-#     analysis = MetaAnalysis(args.combined_csv)
+    args = parser.parse_args()
+    analysis = MetaAnalysis(args.meta_combined_csv)
 
-#     peer_count = article_count = None
-#     if args.mode == 'peer' or args.mode == 'all':
-#         peer_count = analysis.get_peer_review_count(args.zip_file)
-#         print(f"Number of peer reviews: {peer_count}")
-#     if args.mode == 'article' or args.mode == 'all':
-#         article_count = analysis.get_article_count(args.zip_file)
-#         print(f"Number of articles: {article_count}")
+    peer_count = article_count = None
+    if args.meta_mode == 'peer' or args.meta_mode == 'all':
+        peer_count = analysis.get_peer_review_count(args.meta_zip_file)
+        print(f"Number of peer reviews: {peer_count}")
+    if args.meta_mode == 'article' or args.meta_mode == 'all':
+        article_count = analysis.get_article_count(args.meta_zip_file)
+        print(f"Number of articles: {article_count}")
 
-#     if args.output_file:
-#         analysis.save_counts_to_csv(args.output_file, peer_count, article_count)
+    if args.meta_output_file:
+        analysis.save_counts_to_csv(args.meta_output_file, peer_count, article_count)
 
 
 
