@@ -111,41 +111,41 @@ class Delta:
 
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Join peer review and non-peer review DataFrames and calculate delta.")
-    parser.add_argument("--peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
-    parser.add_argument("--non_peer_review_dir", help="The directory containing the non-peer review CSV files.", required=True)
-    parser.add_argument("--output_path", help="The path of the output CSV file.", required=True)
-    args = parser.parse_args()
-    data_filter = Filter(args.peer_review_dir, args.non_peer_review_dir, args.output_path)
-    print("Reading and concatenating peer review dataframes...")
-    concatenated_peer_df = data_filter.read_and_concatenate_dataframes(args.peer_review_dir)
-    print("Peer review dataframes read and concatenated successfully.")
+# def main():
+#     parser = argparse.ArgumentParser(description="Join peer review and non-peer review DataFrames and calculate delta.")
+#     parser.add_argument("--peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
+#     parser.add_argument("--non_peer_review_dir", help="The directory containing the non-peer review CSV files.", required=True)
+#     parser.add_argument("--output_path", help="The path of the output CSV file.", required=True)
+#     args = parser.parse_args()
+#     data_filter = Filter(args.peer_review_dir, args.non_peer_review_dir, args.output_path)
+#     print("Reading and concatenating peer review dataframes...")
+#     concatenated_peer_df = data_filter.read_and_concatenate_dataframes(args.peer_review_dir)
+#     print("Peer review dataframes read and concatenated successfully.")
     
-    print("Reading and concatenating non-peer review dataframes...")
-    concatenated_non_peer_df = data_filter.read_and_concatenate_dataframes(args.non_peer_review_dir)
-    print("Non-peer review dataframes read and concatenated successfully.")
+#     print("Reading and concatenating non-peer review dataframes...")
+#     concatenated_non_peer_df = data_filter.read_and_concatenate_dataframes(args.non_peer_review_dir)
+#     print("Non-peer review dataframes read and concatenated successfully.")
 
-    print("Validating dataframes...")
-    data_filter.validate_dataframes(concatenated_peer_df, concatenated_non_peer_df)
-    print("Dataframes validated successfully.")
+#     print("Validating dataframes...")
+#     data_filter.validate_dataframes(concatenated_peer_df, concatenated_non_peer_df)
+#     print("Dataframes validated successfully.")
     
-    print("Joining dataframes...")
-    joined_df = data_filter.join_dataframes(concatenated_peer_df, concatenated_non_peer_df)
-    print("Dataframes joined successfully.")
+#     print("Joining dataframes...")
+#     joined_df = data_filter.join_dataframes(concatenated_peer_df, concatenated_non_peer_df)
+#     print("Dataframes joined successfully.")
     
-    print("Adding provenance information...")
-    joined_df_with_provenance = data_filter.add_provenance(joined_df)
-    print("Provenance information added successfully.")
+#     print("Adding provenance information...")
+#     joined_df_with_provenance = data_filter.add_provenance(joined_df)
+#     print("Provenance information added successfully.")
 
-    print("Calculating delta column...")
-    delta_calculator = Delta(joined_df_with_provenance)
-    delta_calculator.add_delta_column()
-    print("Delta column calculated successfully.")
+#     print("Calculating delta column...")
+#     delta_calculator = Delta(joined_df_with_provenance)
+#     delta_calculator.add_delta_column()
+#     print("Delta column calculated successfully.")
 
-    print("Saving CSV with delta column...")
-    data_filter.save_csv(joined_df_with_provenance)
-    print("CSV with delta column saved successfully.")
+#     print("Saving CSV with delta column...")
+#     data_filter.save_csv(joined_df_with_provenance)
+#     print("CSV with delta column saved successfully.")
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

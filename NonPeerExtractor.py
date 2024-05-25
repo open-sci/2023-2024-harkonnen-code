@@ -94,20 +94,20 @@ class CSVWriter:
                         })
             print("Batch saved to", output_filename)
 
-def main():
-    parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
-    parser.add_argument("zip_filename", help="The input ZIP file containing JSON.gz files.")
-    parser.add_argument("output_filenames", help="The output CSV file(s).", nargs='+')
-    parser.add_argument("--batch_size", type=int, default=10, help="Number of files to process in each batch.")
-    parser.add_argument("--max_files", type=int, help="Maximum number of files to process.")
-    parser.add_argument("--max_workers", type=int, default=2, help="Number of maximum worker threads.")
+# def main():
+#     parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
+#     parser.add_argument("zip_filename", help="The input ZIP file containing JSON.gz files.")
+#     parser.add_argument("output_filenames", help="The output CSV file(s).", nargs='+')
+#     parser.add_argument("--batch_size", type=int, default=10, help="Number of files to process in each batch.")
+#     parser.add_argument("--max_files", type=int, help="Maximum number of files to process.")
+#     parser.add_argument("--max_workers", type=int, default=2, help="Number of maximum worker threads.")
 
 
-    args = parser.parse_args()
+#     args = parser.parse_args()
 
-    csv_writer = CSVWriter(args.output_filenames)
-    article_processor = NonPeerExtractor(args.zip_filename, args.batch_size)
-    article_processor.process_files(csv_writer, args.max_files)
+#     csv_writer = CSVWriter(args.output_filenames)
+#     article_processor = NonPeerExtractor(args.zip_filename, args.batch_size)
+#     article_processor.process_files(csv_writer, args.max_files)
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()

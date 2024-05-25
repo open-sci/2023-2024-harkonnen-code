@@ -38,12 +38,14 @@ def parse_args():
     parser.add_argument("--peer_output_filenames", help="The output CSV file(s).", nargs='+')
     parser.add_argument("--peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     parser.add_argument("--peer_max_files", type=int, help="Maximum number of files to process.")
+    parser.add_argument("--max_workers", type=int, default=2, help="Number of maximum worker threads.")
 
     # NonPeerExtractor -- parameters  
     parser.add_argument("--zip_filename", help="The input ZIP file containing JSON.gz files.")
     parser.add_argument("--non_peer_output_filenames", help="The output CSV file(s).", nargs='+')
     parser.add_argument("--non_peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     parser.add_argument("--non_peer_max_files", type=int, help="Maximum number of files to process.")
+    parser.add_argument("--max_workers", type=int, default=2, help="Number of maximum worker threads.")
     
     # FilterJoinDelta -- parameters
     parser.add_argument("--peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
@@ -82,7 +84,7 @@ def main():
 
     # PeerExtractor
     csv_writer = CSVWriter(args.peer_output_filenames)
-    article_processor = PeerExtractor(args.zip_filename, args.peer_batch_size)
+    article_processor = PeerExtractor(args.zip_filename, args.peer_batch_size, args.max_workers)
     article_processor.process_files(csv_writer, args.peer_max_files)
 
     for output_filename in args.peer_output_filenames:
@@ -92,7 +94,7 @@ def main():
 
     # NonPeerExtractor
     csv_writer = CSVWriter(args.non_peer_output_filenames)
-    article_processor = NonPeerExtractor(args.zip_filename, args.non_peer_batch_size)
+    article_processor = NonPeerExtractor(args.zip_filename, args.non_peer_batch_size, args.max_workers)
     article_processor.process_files(csv_writer, args.non_peer_max_files)
 
     
