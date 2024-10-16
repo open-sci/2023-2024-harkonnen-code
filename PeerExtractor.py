@@ -131,11 +131,10 @@ class CSVWriter:
             self.output_filenames = output_filenames
         self.header_written = False
 
-
     def write_to_csv(self, peer_review_items):
         for output_filename in self.output_filenames:
             with open(output_filename, 'a', newline='', encoding='utf-8') as output_file:
-                fieldnames = ["oci", "citing_doi", "cited_doi", "citing_date", "citing_url"]
+                fieldnames = ["oci", "citing_doi", "cited_doi", "citing_date", "citing_url", "author_info"]
                 writer = csv.DictWriter(output_file, fieldnames=fieldnames)
                 if output_file.tell() == 0:
                     writer.writeheader()
@@ -151,13 +150,31 @@ class CSVWriter:
                         cited_entity_local_id = oci_processor.convert_doi_to_ci(doi_a)
                         oci = "oci:" + citing_entity_local_id + "-" + cited_entity_local_id
                         date_peer_review = str(element["created"]["date-time"])[:10]
+
+                        # Estrazione informazioni sugli autori
+                        author_list = []
+                        for author in element.get("author", []):
+                            family_name = author.get("family", "").strip()
+                            given_name = author.get("given", "").strip()
+                            
+                            if family_name and given_name:
+                                author_info = f"{family_name}, {given_name}"
+                            else:
+                                author_info = family_name  # Solo il cognome se manca il nome
+
+                            orcid = author.get("ORCID", "")
+                            author_list.append(f"{author_info} (ORCID: {orcid})" if orcid else author_info)
+
+                        author_info_str = "; ".join(author_list)
+
                         if doi_p and doi_a:
                             writer.writerow({
                                 "oci": oci,
                                 "citing_doi": doi_p,
                                 "cited_doi": doi_a,
                                 "citing_date": date_peer_review,
-                                "citing_url": url_p
+                                "citing_url": url_p,
+                                "author_info": author_info_str
                             })
             print("peer items saved to", output_filename)
 
@@ -166,6 +183,7 @@ class CSVWriter:
         df_unique = df.unique(subset=['oci'])
         df_unique.write_csv(output_filename)
         print(f"Unique peer items saved to {output_filename}")
+
 
 def main():
     parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
