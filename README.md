@@ -74,6 +74,7 @@ The workflow addresses key research questions about citation dynamics and peer r
     ```sh
         pip install -r requirements.txt
     ```
+    
 4. **Prepare Data: Download the datasets**:
     - Crossref: Crossref Dump (185GB, April 2023) 
         - It is necessary to specify that the dataset used and for which this work pipe was designed was supplied to us divided into 18 chunks of smaller size than the original file. Theoretically, we do not foresee any problems in using a single file, but for professional ethics it is necessary to make this incision so that for reproducibility issues the user knows our work path
