@@ -67,8 +67,8 @@ The workflow addresses key research questions about citation dynamics and peer r
 1. **Requirements**: Python 3.10 or later.
 2. **Clone the Repository**:
    ```bash
-   git clone https://github.com/username/OpenCitations-Enhanced-Citation-Index
-   cd OpenCitations-Enhanced-Citation-Index
+   git clone https://github.com/open-sci/2023-2024-harkonnen-code/tree/main
+   cd 2023-2024-harkonnen-code/
 
 3. **Install Dependencies**:
     ```sh
@@ -79,6 +79,8 @@ The workflow addresses key research questions about citation dynamics and peer r
         - It is necessary to specify that the dataset used and for which this work pipe was designed was supplied to us divided into 18 chunks of smaller size than the original file. Theoretically, we do not foresee any problems in using a single file, but for professional ethics it is necessary to make this incision so that for reproducibility issues the user knows our work path
 
     - OpenCitations Meta: Meta Dump (11GB, April 2024)
+
+---
 
 ### Workflow Execution
 
@@ -134,6 +136,8 @@ Cross-Reference Data with OpenCitations Meta:
     ```sh
         python run.py Meta <combined_csv> <meta_zip_file> --meta_mode all --meta_output_file <output_csv>
     ```
+---
+
 **Research Questions**:
 
 - What percentage of Crossref peer reviews are in OpenCitations Meta?
