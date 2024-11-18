@@ -134,23 +134,24 @@ Cross-Reference Data with OpenCitations Meta:
     ```sh
         python run.py Meta <combined_csv> <meta_zip_file> --meta_mode all --meta_output_file <output_csv>
     ```
-Research Questions
+**Research Questions**:
 
 - What percentage of Crossref peer reviews are in OpenCitations Meta?
 - Which venues receive the most peer reviews?
 - How many citations involve resources in both Crossref and Meta?
 - What are the time dynamics of peer-reviewed citations?
 
-### Data Details
+### Data Details:
+
 **Crossref**:
 
-    Size: 185GB (April 2023)
-    Structure: Metadata for scholarly publications including DOIs, titles, authors, dates, venues, peer review details.
+- Size: 185GB (April 2023)
+    - Structure: Metadata for scholarly publications including DOIs, titles, authors, dates, venues, peer review details.
 
 **OpenCitations Meta**:
 
-    Size: 11GB (April 2024)
-    Structure: Citation networks including citing DOI, cited DOI, publication dates, and reviewer information.
+- Size: 11GB (April 2024)
+    - Structure: Citation networks including citing DOI, cited DOI, publication dates, and reviewer information.
 
 ## Results:
 
@@ -162,6 +163,6 @@ Research Questions
   - Venues
 - RDF:
   - Serialized triples in N-Triples format
-  
+
 **Visualizations**:
 - Bar charts, donut charts, and line graphs for citation statistics and dynamics.
