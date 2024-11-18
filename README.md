@@ -147,14 +147,14 @@ Research Questions
 
 **Outputs**:
 
--     CSV Files:
-  -       Citations
-  -       Provenance
-  -       Venues
--     RDF:
-  -       Serialized triples in N-Triples format.
+- CSV Files:
+  - Citations
+  - Provenance
+  - Venues
+- RDF:
+  - Serialized triples in N-Triples format.
 **Visualizations**:
--       Bar charts, donut charts, and line graphs for citation statistics and dynamics.
+- Bar charts, donut charts, and line graphs for citation statistics and dynamics.
 
 ### Repository Structure:
 
