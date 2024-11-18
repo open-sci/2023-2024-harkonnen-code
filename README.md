@@ -2,7 +2,7 @@
 
 A repository for the systematic extraction, processing, and analysis of peer review data from Crossref to create a novel citation index compliant with the OpenCitations Data Model.
 
-## Quick Overview of the repository:
+## Repository Structure:
 ```
 2023-2024-HARKONNEN-CODE/
 │
@@ -75,8 +75,10 @@ The workflow addresses key research questions about citation dynamics and peer r
         pip install -r requirements.txt
     ```
 4. **Prepare Data: Download the datasets**:
-        Crossref: Crossref Dump (185GB, April 2023)
-        OpenCitations Meta: Meta Dump (11GB, April 2024)
+- Crossref: Crossref Dump (185GB, April 2023) 
+    - It is necessary to specify that the dataset used and for which this work pipe was designed was supplied to us divided into 18 chunks of smaller size than the original file. Theoretically, we do not foresee any problems in using a single file, but for professional ethics it is necessary to make this incision so that for reproducibility issues the user knows our work path
+
+- OpenCitations Meta: Meta Dump (11GB, April 2024)
 
 ### Workflow Execution
 
@@ -85,36 +87,36 @@ The workflow addresses key research questions about citation dynamics and peer r
 Extract data from the Crossref dump:
 
 Peer Reviews:
-```sh
-    python run.py PeerExtractor <path_to_zip> <output_csv>
-```
+    ```sh
+        python run.py PeerExtractor <path_to_zip> <output_csv>
+    ```
 Non-Peer Reviews:
-```sh
-    python run.py NonPeerExtractor <path_to_zip> <output_csv>
-```
+    ```sh
+        python run.py NonPeerExtractor <path_to_zip> <output_csv>
+    ```
 2. **Data Processing**:
 
 Combine datasets and calculate temporal deltas:
-```sh
-    python run.py FilterJoinDeltaDir \
-    --filter_peer_review_dir <peer_dir> \
-    --filter_non_peer_review_dir <non_peer_dir> \
-    --filter_output_path <output_csv>
-```
+    ```sh
+        python run.py FilterJoinDeltaDir \
+        --filter_peer_review_dir <peer_dir> \
+        --filter_non_peer_review_dir <non_peer_dir> \
+        --filter_output_path <output_csv>
+    ```
 3. **Post-Processing**:
 
 Split Data into Separate CSVs:
-```sh
-    python run.py Compartimentizer <input_csv>
-```
+    ```sh
+        python run.py Compartimentizer <input_csv>
+    ```
 Generate RDF:
-```sh
-    python run.py RDF \
-      --rdf_input <input_csv> \
-      --rdf_output <output_file> \
-      --rdf_baseurl <base_url> \
-      --rdf_populate_data
-```
+    ```sh
+        python run.py RDF \
+        --rdf_input <input_csv> \
+        --rdf_output <output_file> \
+        --rdf_baseurl <base_url> \
+        --rdf_populate_data
+    ```
 4. **Data Analysis and Visualization**:
 
 Analyze Top Venues:
@@ -155,13 +157,3 @@ Research Questions
   - Serialized triples in N-Triples format.
 **Visualizations**:
 - Bar charts, donut charts, and line graphs for citation statistics and dynamics.
-
-### Repository Structure:
-
--   **PeerExtractor.py**: Extract peer review data.
--   **NonPeerExtractor.py**: Extract non-peer-reviewed data.
--   **FilterJoinDeltaDir.py**: Combine datasets and compute deltas.
--   **Compartimentizer.py**: Split data into separate CSVs.
--   **RDFcreator.py**: Create RDF graphs from citation data.
--   **VenueCounter.py**: Analyze publication venues.
--   **MetaAnalysis.py**: Compare Crossref with OpenCitations Meta.
