@@ -1,6 +1,44 @@
-# OpenCitations-Enhanced-Citation-Index Workflow
+# PROCI Workflow
 
 A repository for the systematic extraction, processing, and analysis of peer review data from Crossref to create a novel citation index compliant with the OpenCitations Data Model.
+
+## Quick Overview of the repository:
+OpenCitations-Enhanced-Citation-Index/
+│
+├── data/
+│   ├── raw/
+│   │   └── lookup.csv
+│   │    
+│   ├── processed/
+│   │   ├── analysis
+│   │   ├── compartimentized
+│   │   ├── filtered
+│   │   ├── non peer
+│   │   └── peer
+│   │  
+│   └── results/
+│
+├── scripts/
+│   ├── extraction/
+│   │   ├── PeerExtractor.py
+│   │   └── NonPeerExtractor.py
+│   ├── processing/
+│   │   ├── FilterJoinDeltaDir.py
+│   │   └── Compartimentizer.py
+│   ├── post_processing/
+│   │   └── RDFcreator.py
+│   ├── analysis/
+│   │   ├── VenueCounter.py
+│   │   └── MetaAnalysis.py
+│   └── run.py
+│
+├── notebooks/
+│   └── workflow.ipynb
+│
+├── requirements.txt
+├── README.md
+└── LICENSE.md
+
 
 ---
 
@@ -32,9 +70,9 @@ The workflow addresses key research questions about citation dynamics and peer r
    cd OpenCitations-Enhanced-Citation-Index
 
 3. **Install Dependencies**:
-```sh
-    pip install -r requirements.txt
-```
+    ```sh
+        pip install -r requirements.txt
+    ```
 4. **Prepare Data: Download the datasets**:
         Crossref: Crossref Dump (185GB, April 2023)
         OpenCitations Meta: Meta Dump (11GB, April 2024)
@@ -104,8 +142,9 @@ Research Questions
     Size: 11GB (April 2024)
     Structure: Citation networks including citing DOI, cited DOI, publication dates, and reviewer information.
 
-**Results**
-Outputs
+## Results:
+
+**Outputs**:
 
 -     CSV Files:
   -       Citations
@@ -113,8 +152,8 @@ Outputs
   -       Venues
 -     RDF:
   -       Serialized triples in N-Triples format.
--   Visualizations:
-  -       Bar charts, donut charts, and line graphs for citation statistics and dynamics.
+**Visualizations**:
+-       Bar charts, donut charts, and line graphs for citation statistics and dynamics.
 
 ### Repository Structure:
 

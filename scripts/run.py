@@ -33,7 +33,7 @@ def parse_args():
     # PeerExtractor -- parameters
     peer_parser = subparsers.add_parser('PeerExtractor', help='Process JSON.gz files in a ZIP and output to CSV.')
     peer_parser.add_argument("peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    peer_parser.add_argument("peer_output_filenames", help="The output CSV file(s).", nargs='+')
+    peer_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/peer")
     peer_parser.add_argument("--peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     peer_parser.add_argument("--peer_max_files", type=int, help="Maximum number of files to process.")
     peer_parser.add_argument("--peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
@@ -43,25 +43,24 @@ def parse_args():
     # NonPeerExtractor -- parameters
     non_peer_parser = subparsers.add_parser('NonPeerExtractor', help='Process JSON.gz files in a ZIP and output to CSV.')
     non_peer_parser.add_argument("non_peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    non_peer_parser.add_argument("non_peer_output_filenames", help="The output CSV file(s).", nargs='+')
+    non_peer_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/non_peer")
     non_peer_parser.add_argument("--non_peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     non_peer_parser.add_argument("--non_peer_max_files", type=int, help="Maximum number of files to process.")
     non_peer_parser.add_argument("--non_peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
 
-
     
     # FilterJoinDelta -- parameters
     filter_parser = subparsers.add_parser("FilterJoinDeltaDir", help="Join peer review and non-peer review DataFrames and calculate delta")
-    # filter_parser = argparse.ArgumentParser(description="Join peer review and non-peer review DataFrames and calculate delta.")
     filter_parser.add_argument("--filter_peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
     filter_parser.add_argument("--filter_non_peer_review_dir", help="The directory containing the non-peer review CSV files.", required=True)
-    filter_parser.add_argument("--filter_output_path", help="The path of the output CSV file.", required=True)    
+    filter_parser.add_argument("--output_dir", help="Directory to save the output CSV file", default="data/processed")  
     
     # Compartimentizer -- parameters
     # parser = argparse.ArgumentParser(description="DataFrame Compartimentizer")
     compart_parser = subparsers.add_parser("Compartimentizer", help="DataFrame Compartimentizer")
     compart_parser.add_argument("compart_input_path", help="Path to the input CSV file")
-
+    compart_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/compartimentized")
+    
     # RDFcreator -- parameters
     # parser = argparse.ArgumentParser(description='Process some integers.')
     rdf_parser = subparsers.add_parser("RDF", help="Process some integers.")

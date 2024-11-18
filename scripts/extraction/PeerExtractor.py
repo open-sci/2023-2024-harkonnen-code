@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 import polars as pl
 
-LOOKUP_CSV = 'lookup.csv'
+LOOKUP_CSV = 'data\raw\lookup.csv'
 CROSSREF_CODE = '020'
 
 class PeerExtractor:
@@ -188,21 +188,30 @@ class CSVWriter:
 def main():
     parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
     parser.add_argument("peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    parser.add_argument("peer_output_filenames", help="The output CSV file(s).", nargs='+')
+    parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/peer")
     parser.add_argument("--peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     parser.add_argument("--peer_max_files", type=int, help="Maximum number of files to process.")
     parser.add_argument("--peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
 
-
     args = parser.parse_args()
 
-    csv_writer = CSVWriter(args.peer_output_filenames)
-    article_processor = PeerExtractor(args.peer_zip_filename, args.peer_batch_size)
+    # Assicurati che la directory di output esista
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+
+    # Genera un percorso di output di default basato sul file di input
+    input_basename = os.path.basename(args.peer_zip_filename)
+    input_name_no_ext = os.path.splitext(input_basename)[0]
+    output_filename = os.path.join(args.output_dir, f"{input_name_no_ext}_peer_results.csv")
+
+    # Inizializza CSVWriter con il file di output
+    csv_writer = CSVWriter(output_filename)
+    article_processor = PeerExtractor(args.peer_zip_filename, args.peer_batch_size, args.peer_max_workers)
     article_processor.process_files(csv_writer, args.peer_max_files)
 
-    for output_filename in args.peer_output_filenames:
-        unique_output_filename = output_filename.replace(".csv", "_unique.csv")
-        csv_writer.remove_duplicates(output_filename, unique_output_filename)
+    # Rimuovi duplicati
+    unique_output_filename = output_filename.replace(".csv", "_unique.csv")
+    csv_writer.remove_duplicates(output_filename, unique_output_filename)
 
 if __name__ == "__main__":
     main()

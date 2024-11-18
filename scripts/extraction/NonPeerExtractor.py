@@ -5,6 +5,7 @@ import csv
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import argparse
 from tqdm import tqdm
+import os
 
 class NonPeerExtractor:
     def __init__(self, zip_filename, batch_size=10, max_workers = 2):
@@ -97,16 +98,25 @@ class CSVWriter:
 def main():
     parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
     parser.add_argument("non_peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    parser.add_argument("non_peer_output_filenames", help="The output CSV file(s).", nargs='+')
+    parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/non_peer")
     parser.add_argument("--non_peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     parser.add_argument("--non_peer_max_files", type=int, help="Maximum number of files to process.")
     parser.add_argument("--non_peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
 
-
     args = parser.parse_args()
 
-    csv_writer = CSVWriter(args.non_peer_output_filenames)
-    article_processor = NonPeerExtractor(args.non_peer_zip_filename, args.non_peer_batch_size)
+    # Assicurati che la directory di output esista
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+
+    # Genera un percorso di output di default basato sul file di input
+    input_basename = os.path.basename(args.non_peer_zip_filename)
+    input_name_no_ext = os.path.splitext(input_basename)[0]
+    output_filename = os.path.join(args.output_dir, f"{input_name_no_ext}_non_peer_results.csv")
+
+    # Inizializza CSVWriter con il file di output
+    csv_writer = CSVWriter(output_filename)
+    article_processor = NonPeerExtractor(args.non_peer_zip_filename, args.non_peer_batch_size, args.non_peer_max_workers)
     article_processor.process_files(csv_writer, args.non_peer_max_files)
 
 if __name__ == "__main__":

@@ -115,13 +115,22 @@ def main():
     parser = argparse.ArgumentParser(description="Join peer review and non-peer review DataFrames and calculate delta.")
     parser.add_argument("--filter_peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
     parser.add_argument("--filter_non_peer_review_dir", help="The directory containing the non-peer review CSV files.", required=True)
-    parser.add_argument("--filter_output_path", help="The path of the output CSV file.", required=True)
+    parser.add_argument("--output_dir", help="Directory to save the output CSV file", default="data/processed")
     args = parser.parse_args()
-    data_filter = Filter(args.filter_peer_review_dir, args.filter_non_peer_review_dir, args.filter_output_path)
+
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+
+    peer_review_basename = os.path.basename(os.path.normpath(args.filter_peer_review_dir))
+    output_filename = f"{peer_review_basename}_filtered_delta.csv"
+    output_path = os.path.join(args.output_dir, output_filename)
+
+    data_filter = Filter(args.filter_peer_review_dir, args.filter_non_peer_review_dir, output_path)
+
     print("Reading and concatenating peer review dataframes...")
     concatenated_peer_df = data_filter.read_and_concatenate_dataframes(args.filter_peer_review_dir)
     print("Peer review dataframes read and concatenated successfully.")
-    
+
     print("Reading and concatenating non-peer review dataframes...")
     concatenated_non_peer_df = data_filter.read_and_concatenate_dataframes(args.filter_non_peer_review_dir)
     print("Non-peer review dataframes read and concatenated successfully.")
@@ -129,11 +138,11 @@ def main():
     print("Validating dataframes...")
     data_filter.validate_dataframes(concatenated_peer_df, concatenated_non_peer_df)
     print("Dataframes validated successfully.")
-    
+
     print("Joining dataframes...")
     joined_df = data_filter.join_dataframes(concatenated_peer_df, concatenated_non_peer_df)
     print("Dataframes joined successfully.")
-    
+
     print("Adding provenance information...")
     joined_df_with_provenance = data_filter.add_provenance(joined_df)
     print("Provenance information added successfully.")
@@ -144,7 +153,7 @@ def main():
     print("Delta column calculated successfully.")
 
     print("Saving CSV with delta column...")
-    data_filter.save_csv(joined_df_with_provenance)
+    data_filter.save_csv(delta_calculator.df)
     print("CSV with delta column saved successfully.")
 
 if __name__ == "__main__":

@@ -1,5 +1,6 @@
 import pandas as pd
 import argparse
+import os
 
 class VenueCounter:
     def __init__(self, csv_file_path):
@@ -46,11 +47,11 @@ class VenueCounter:
         grouped_df_comma.to_csv(output_file_path, index=False)
         print(f"Results saved to {output_file_path}")
 
-if __name__ == "__main__":
+def main():
     parser = argparse.ArgumentParser(description="Venue Counter")
     parser.add_argument('venue_csv_file', help='Path to the input CSV file')
     parser.add_argument('--venue_top_n', type=int, default=10, help='Number of top venues to display')
-    parser.add_argument('--venue_output_file', help='Path to the output CSV file to save results')
+    parser.add_argument('--output_dir', help='Directory to save the output file', default="data/processed/analysis")
 
     args = parser.parse_args()
     counter = VenueCounter(args.venue_csv_file)
@@ -58,5 +59,16 @@ if __name__ == "__main__":
     print(f"Top {args.venue_top_n} venues:")
     print(top_venues)
 
-    if args.venue_output_file:
-        counter.save_to_csv(args.venue_output_file)
+    # Generazione del percorso di output predefinito
+    input_basename = os.path.splitext(os.path.basename(args.venue_csv_file))[0]
+    output_filename = f"{input_basename}_venue_count.csv"
+    output_path = os.path.join(args.output_dir, output_filename)
+
+    # Assicurati che la directory di output esista
+    if not os.path.exists(args.output_dir):
+        os.makedirs(args.output_dir)
+
+    counter.save_to_csv(output_path)
+    
+if __name__ == "__main__":
+    main()
