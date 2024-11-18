@@ -3,7 +3,8 @@
 A repository for the systematic extraction, processing, and analysis of peer review data from Crossref to create a novel citation index compliant with the OpenCitations Data Model.
 
 ## Quick Overview of the repository:
-OpenCitations-Enhanced-Citation-Index/
+```
+2023-2024-HARKONNEN-CODE/
 │
 ├── data/
 │   ├── raw/
@@ -38,7 +39,7 @@ OpenCitations-Enhanced-Citation-Index/
 ├── requirements.txt
 ├── README.md
 └── LICENSE.md
-
+```
 
 ---
 
