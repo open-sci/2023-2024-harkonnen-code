@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
 import polars as pl
 
-LOOKUP_CSV = 'data\raw\lookup.csv'
+LOOKUP_CSV = '../data/raw/lookup.csv'
 CROSSREF_CODE = '020'
 
 class PeerExtractor:
@@ -19,6 +19,7 @@ class PeerExtractor:
         self.max_workers = max_workers
 
     def process_files(self, csv_writer, max_files=None):
+        print("Using PeerExtractor")
         with zipfile.ZipFile(self.zip_filename, 'r') as zip_file:
             file_infos = [file_info for file_info in zip_file.infolist() if file_info.filename.endswith(".json.gz")]
             
@@ -123,7 +124,7 @@ class OciProcess:
             ci_str += str(self.lookup_dic[c])
         return ci_str
 
-class CSVWriter:
+class CSVWriterPeer:
     def __init__(self, output_filenames):
         if isinstance(output_filenames, str):
             self.output_filenames = [output_filenames]
@@ -133,6 +134,12 @@ class CSVWriter:
 
     def write_to_csv(self, peer_review_items):
         for output_filename in self.output_filenames:
+            # Creazione automatica della directory
+            output_dir = os.path.dirname(output_filename)
+            if output_dir and not os.path.exists(output_dir):
+                print(f"Creating directory for output: {output_dir}")
+                os.makedirs(output_dir)
+            
             with open(output_filename, 'a', newline='', encoding='utf-8') as output_file:
                 fieldnames = ["oci", "citing_doi", "cited_doi", "citing_date", "citing_url", "author_info"]
                 writer = csv.DictWriter(output_file, fieldnames=fieldnames)
@@ -183,35 +190,3 @@ class CSVWriter:
         df_unique = df.unique(subset=['oci'])
         df_unique.write_csv(output_filename)
         print(f"Unique peer items saved to {output_filename}")
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
-    parser.add_argument("peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/peer")
-    parser.add_argument("--peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
-    parser.add_argument("--peer_max_files", type=int, help="Maximum number of files to process.")
-    parser.add_argument("--peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
-
-    args = parser.parse_args()
-
-    # Assicurati che la directory di output esista
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-
-    # Genera un percorso di output di default basato sul file di input
-    input_basename = os.path.basename(args.peer_zip_filename)
-    input_name_no_ext = os.path.splitext(input_basename)[0]
-    output_filename = os.path.join(args.output_dir, f"{input_name_no_ext}_peer_results.csv")
-
-    # Inizializza CSVWriter con il file di output
-    csv_writer = CSVWriter(output_filename)
-    article_processor = PeerExtractor(args.peer_zip_filename, args.peer_batch_size, args.peer_max_workers)
-    article_processor.process_files(csv_writer, args.peer_max_files)
-
-    # Rimuovi duplicati
-    unique_output_filename = output_filename.replace(".csv", "_unique.csv")
-    csv_writer.remove_duplicates(output_filename, unique_output_filename)
-
-if __name__ == "__main__":
-    main()

@@ -8,12 +8,13 @@ from tqdm import tqdm
 import os
 
 class NonPeerExtractor:
-    def __init__(self, zip_filename, batch_size=10, max_workers = 2):
+    def __init__(self, zip_filename, batch_size=10, max_workers=2):
         self.zip_filename = zip_filename
         self.batch_size = batch_size
         self.max_workers = max_workers
 
     def process_files(self, csv_writer, max_files=None):
+        print("Using NonPeerExtractor")
         with zipfile.ZipFile(self.zip_filename, 'r') as zip_file:
             file_infos = [file_info for file_info in zip_file.infolist() if file_info.filename.endswith(".json.gz")]
             
@@ -63,7 +64,7 @@ class NonPeerExtractor:
         non_peer_review_items = [item for item in items if item.get('type') != 'peer-review']
         return non_peer_review_items
 
-class CSVWriter:
+class CSVWriterNonPeer:
     def __init__(self, output_filenames):
         if isinstance(output_filenames, str):
             self.output_filenames = [output_filenames]
@@ -73,6 +74,12 @@ class CSVWriter:
 
     def write_to_csv(self, non_peer_review_items):
         for output_filename in self.output_filenames:
+            # Creazione automatica della directory
+            output_dir = os.path.dirname(output_filename)
+            if output_dir and not os.path.exists(output_dir):
+                print(f"Creating directory for output: {output_dir}")
+                os.makedirs(output_dir)
+            
             with open(output_filename, 'a', newline='', encoding='utf-8') as output_file:
                 fieldnames = ['cited_doi', 'cited_url', 'cited_issn', 'cited_venue', 'cited_date']
                 writer = csv.DictWriter(output_file, fieldnames=fieldnames)
@@ -94,30 +101,3 @@ class CSVWriter:
                             "cited_date": date_non_peer_review
                         })
             print("Batch saved to", output_filename)
-
-def main():
-    parser = argparse.ArgumentParser(description="Process JSON.gz files in a ZIP and output to CSV.")
-    parser.add_argument("non_peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/non_peer")
-    parser.add_argument("--non_peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
-    parser.add_argument("--non_peer_max_files", type=int, help="Maximum number of files to process.")
-    parser.add_argument("--non_peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
-
-    args = parser.parse_args()
-
-    # Assicurati che la directory di output esista
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-
-    # Genera un percorso di output di default basato sul file di input
-    input_basename = os.path.basename(args.non_peer_zip_filename)
-    input_name_no_ext = os.path.splitext(input_basename)[0]
-    output_filename = os.path.join(args.output_dir, f"{input_name_no_ext}_non_peer_results.csv")
-
-    # Inizializza CSVWriter con il file di output
-    csv_writer = CSVWriter(output_filename)
-    article_processor = NonPeerExtractor(args.non_peer_zip_filename, args.non_peer_batch_size, args.non_peer_max_workers)
-    article_processor.process_files(csv_writer, args.non_peer_max_files)
-
-if __name__ == "__main__":
-    main()

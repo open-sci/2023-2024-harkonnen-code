@@ -24,15 +24,23 @@ class Filter:
                     dataframes.append(df_normalized)
                 except Exception as e:
                     print(f"Error reading file {file}: {e}")
+        
+        if not dataframes:
+            raise ValueError(f"No valid CSV files found in directory: {directory}")
+        
         concatenated_df = pl.concat(dataframes)
-
-        return concatenated_df 
+        return concatenated_df
 
 
 
     def validate_dataframes(self, df1, df2):
-        if self.column_to_join not in df1.columns or self.column_to_join not in df2.columns:
+        # Ottieni i nomi delle colonne senza risolvere completamente lo schema
+        df1_columns = df1.collect().columns
+        df2_columns = df2.collect().columns
+
+        if self.column_to_join not in df1_columns or self.column_to_join not in df2_columns:
             raise ValueError(f"Column {self.column_to_join} is not present in both DataFrames.")
+
 
     def join_dataframes(self, df1, df2):
         joined_df = df1.join(df2, on=self.column_to_join, how="inner")
@@ -41,8 +49,7 @@ class Filter:
     def add_provenance(self, df):
         prov_agent_url = "https://academictorrents.com/details/d9e554f4f0c3047d9f49e448a7004f7aa1701b69"
         source_url = "https://doi.org/10.13003/8wx5k"
-        timezone = pytz.timezone("UTC")
-        current_timestamp = datetime.now(timezone).strftime('%Y-%m-%dT%H:%M:%S%z')
+        current_timestamp = datetime.utcnow().isoformat() + "Z"
 
         df = df.with_columns([
             pl.lit(prov_agent_url).alias('prov_agent'),
@@ -50,6 +57,7 @@ class Filter:
             pl.lit(current_timestamp).alias('prov_date')
         ])
         return df
+
 
 
 class Delta:
@@ -108,53 +116,3 @@ class Delta:
     def save_csv(self, output_csv):
         self.df.sink_csv(output_csv)
         print(f"CSV with Delta column saved as {output_csv}")
-
-
-
-def main():
-    parser = argparse.ArgumentParser(description="Join peer review and non-peer review DataFrames and calculate delta.")
-    parser.add_argument("--filter_peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
-    parser.add_argument("--filter_non_peer_review_dir", help="The directory containing the non-peer review CSV files.", required=True)
-    parser.add_argument("--output_dir", help="Directory to save the output CSV file", default="data/processed")
-    args = parser.parse_args()
-
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-
-    peer_review_basename = os.path.basename(os.path.normpath(args.filter_peer_review_dir))
-    output_filename = f"{peer_review_basename}_filtered_delta.csv"
-    output_path = os.path.join(args.output_dir, output_filename)
-
-    data_filter = Filter(args.filter_peer_review_dir, args.filter_non_peer_review_dir, output_path)
-
-    print("Reading and concatenating peer review dataframes...")
-    concatenated_peer_df = data_filter.read_and_concatenate_dataframes(args.filter_peer_review_dir)
-    print("Peer review dataframes read and concatenated successfully.")
-
-    print("Reading and concatenating non-peer review dataframes...")
-    concatenated_non_peer_df = data_filter.read_and_concatenate_dataframes(args.filter_non_peer_review_dir)
-    print("Non-peer review dataframes read and concatenated successfully.")
-
-    print("Validating dataframes...")
-    data_filter.validate_dataframes(concatenated_peer_df, concatenated_non_peer_df)
-    print("Dataframes validated successfully.")
-
-    print("Joining dataframes...")
-    joined_df = data_filter.join_dataframes(concatenated_peer_df, concatenated_non_peer_df)
-    print("Dataframes joined successfully.")
-
-    print("Adding provenance information...")
-    joined_df_with_provenance = data_filter.add_provenance(joined_df)
-    print("Provenance information added successfully.")
-
-    print("Calculating delta column...")
-    delta_calculator = Delta(joined_df_with_provenance)
-    delta_calculator.add_delta_column()
-    print("Delta column calculated successfully.")
-
-    print("Saving CSV with delta column...")
-    data_filter.save_csv(delta_calculator.df)
-    print("CSV with delta column saved successfully.")
-
-if __name__ == "__main__":
-    main()

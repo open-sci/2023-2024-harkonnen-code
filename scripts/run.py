@@ -16,8 +16,8 @@ import pytz
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
-from extraction.PeerExtractor import PeerExtractor, OciProcess, CSVWriter
-from extraction.NonPeerExtractor import NonPeerExtractor, CSVWriter
+from extraction.PeerExtractor import PeerExtractor, OciProcess, CSVWriterPeer
+from extraction.NonPeerExtractor import NonPeerExtractor, CSVWriterNonPeer
 from processing.FilterJoinDeltaDir import Filter, Delta
 from processing.Compartimentizer import Compartimentizer
 from post_processing.RDFcreator import PeerReview, populate_data, populate_prov
@@ -28,22 +28,20 @@ from analysis.MetaAnalysis import MetaAnalysis
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Main program")
-    subparsers = parser.add_subparsers(dest='command')
+    subparsers = parser.add_subparsers(dest='command', required=True)
 
     # PeerExtractor -- parameters
     peer_parser = subparsers.add_parser('PeerExtractor', help='Process JSON.gz files in a ZIP and output to CSV.')
     peer_parser.add_argument("peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    peer_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/peer")
+    peer_parser.add_argument("--peer_output_file", help="Path to save the output CSV file", default="../data/processed/peer/peer_results.csv")
     peer_parser.add_argument("--peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     peer_parser.add_argument("--peer_max_files", type=int, help="Maximum number of files to process.")
     peer_parser.add_argument("--peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
 
-
-
     # NonPeerExtractor -- parameters
     non_peer_parser = subparsers.add_parser('NonPeerExtractor', help='Process JSON.gz files in a ZIP and output to CSV.')
     non_peer_parser.add_argument("non_peer_zip_filename", help="The input ZIP file containing JSON.gz files.")
-    non_peer_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/non_peer")
+    non_peer_parser.add_argument("--non_peer_output_file", help="Path to save the output CSV file", default="../data/processed/non_peer/non_peer_results.csv")
     non_peer_parser.add_argument("--non_peer_batch_size", type=int, default=10, help="Number of files to process in each batch.")
     non_peer_parser.add_argument("--non_peer_max_files", type=int, help="Maximum number of files to process.")
     non_peer_parser.add_argument("--non_peer_max_workers", type=int, default=2, help="Number of maximum worker threads.")
@@ -53,16 +51,14 @@ def parse_args():
     filter_parser = subparsers.add_parser("FilterJoinDeltaDir", help="Join peer review and non-peer review DataFrames and calculate delta")
     filter_parser.add_argument("--filter_peer_review_dir", help="The directory containing the peer review CSV files.", required=True)
     filter_parser.add_argument("--filter_non_peer_review_dir", help="The directory containing the non-peer review CSV files.", required=True)
-    filter_parser.add_argument("--output_dir", help="Directory to save the output CSV file", default="data/processed")  
+    filter_parser.add_argument("--filter_output_path", help="Directory to save the output CSV file", default="../data/processed/filtered/results.csv")  
     
     # Compartimentizer -- parameters
-    # parser = argparse.ArgumentParser(description="DataFrame Compartimentizer")
     compart_parser = subparsers.add_parser("Compartimentizer", help="DataFrame Compartimentizer")
     compart_parser.add_argument("compart_input_path", help="Path to the input CSV file")
-    compart_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="data/processed/compartimentized")
+    compart_parser.add_argument("--output_dir", help="Directory to save the output CSV files", default="../data/processed/compartimentized")
     
     # RDFcreator -- parameters
-    # parser = argparse.ArgumentParser(description='Process some integers.')
     rdf_parser = subparsers.add_parser("RDF", help="Process some integers.")
     rdf_parser.add_argument('--rdf_input', type=str, help='Input CSV file', required=True)
     rdf_parser.add_argument('--rdf_output', type=str, help='Output file', required=True)
@@ -73,19 +69,17 @@ def parse_args():
     rdf_parser.add_argument('--rdf_populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
     
     # VenueCounter -- parameters
-    # parser = argparse.ArgumentParser(description="Venue Counter")
     venue_parser = subparsers.add_parser("Venue", help="Path to the input CSV file")
     venue_parser.add_argument('venue_csv_file', help='Path to the input CSV file')
     venue_parser.add_argument('--venue_top_n', type=int, default=10, help='Number of top venues to display')
     venue_parser.add_argument('--venue_output_file', help='Path to the output CSV file to save results')
 
     # MetaAnalysis -- parameters
-    # parser = argparse.ArgumentParser(description="Meta Analysis")
     meta_parser = subparsers.add_parser("Meta", help="Meta Analysis")
-    parser.add_argument('meta_combined_csv', help='Path to the combined CSV file')
-    parser.add_argument('meta_zip_file', help='Path to the OpenAlex zip file')
-    parser.add_argument('--meta_mode', choices=['peer', 'article', 'all'], default='all', help='Mode of operation')
-    parser.add_argument('--meta_output_file', help='Path to the output CSV file to save counts')
+    meta_parser.add_argument('meta_combined_csv', help='Path to the combined CSV file')
+    meta_parser.add_argument('meta_zip_file', help='Path to the OpenAlex zip file')
+    meta_parser.add_argument('--meta_mode', choices=['peer', 'article', 'all'], default='all', help='Mode of operation')
+    meta_parser.add_argument('--meta_output_file', help='Path to the output CSV file to save counts')
 
     args = parser.parse_args()
     return args
@@ -93,22 +87,38 @@ def parse_args():
 def main():
     args = parse_args()
     print(args)
+    print(f"Running command: {args.command}")
 
     if args.command == 'PeerExtractor':
-        csv_writer = CSVWriter(args.peer_output_filenames)
+        input_basename = os.path.splitext(os.path.basename(args.peer_zip_filename))[0]
+        
+        peer_output_file = os.path.join(
+            os.path.dirname(args.peer_output_file),
+            f"{input_basename}_peer_results.csv"
+        )
+
+        csv_writer = CSVWriterPeer(peer_output_file)
         article_processor = PeerExtractor(args.peer_zip_filename, args.peer_batch_size)
         article_processor.process_files(csv_writer, args.peer_max_files)
 
-        for output_filename in args.peer_output_filenames:
-            unique_output_filename = output_filename.replace(".csv", "_unique.csv")
-            csv_writer.remove_duplicates(output_filename, unique_output_filename)
+        unique_output_filename = peer_output_file.replace(".csv", "_unique.csv")
+        if os.path.isfile(peer_output_file):  
+            csv_writer.remove_duplicates(peer_output_file, unique_output_filename)
+        else:
+            print(f"Errore: Il file {peer_output_file} non esiste o non è un file.")
 
     if args.command == "NonPeerExtractor":
-        csv_writer = CSVWriter(args.non_peer_output_filenames)
+        input_basename = os.path.splitext(os.path.basename(args.non_peer_zip_filename))[0]
+    
+        non_peer_output_file = os.path.join(
+            os.path.dirname(args.non_peer_output_file),
+            f"{input_basename}_non_peer_results.csv"
+        )
+
+        csv_writer = CSVWriterNonPeer(non_peer_output_file)
         article_processor = NonPeerExtractor(args.non_peer_zip_filename, args.non_peer_batch_size)
         article_processor.process_files(csv_writer, args.non_peer_max_files)
 
-    
     # FilterJoinDelta
     if args.command == "FilterJoinDeltaDir":
         data_filter = Filter(args.filter_peer_review_dir, args.filter_non_peer_review_dir, args.filter_output_path)
@@ -130,16 +140,24 @@ def main():
         columns_to_drop = ["cited_issn", "cited_venue", "prov_agent", "source", "prov_date"]
         columns_to_drop1 = ["citing_doi", "cited_doi", "citing_date", "cited_date", "citing_url", "cited_url", "cited_issn", "cited_venue", "cited_date", "time_span"]
         columns_to_drop2 = ["oci", "citing_doi", "citing_date", "cited_date", "citing_url", "cited_url", "cited_date", "time_span", "prov_agent", "source", "prov_date", "time_span"]
-        output_path="Citation.csv"
-        output_path1="Provenance.csv" 
-        output_path2="Venue.csv"
-        compartimentizer = Compartimentizer(columns_to_drop=columns_to_drop, 
-                                            columns_to_drop1=columns_to_drop1, 
-                                            columns_to_drop2=columns_to_drop2, 
-                                            output_path=output_path,
-                                            output_path1=output_path1, 
-                                            output_path2=output_path2)
-        print(f"Saving CSVs as {output_path}, {output_path1} and {output_path2}")
+
+        if not os.path.exists(args.output_dir):
+            os.makedirs(args.output_dir)
+
+        output_path = os.path.join(args.output_dir, "Citation.csv")
+        output_path1 = os.path.join(args.output_dir, "Provenance.csv")
+        output_path2 = os.path.join(args.output_dir, "Venue.csv")
+
+        compartimentizer = Compartimentizer(
+            columns_to_drop=columns_to_drop,
+            columns_to_drop1=columns_to_drop1,
+            columns_to_drop2=columns_to_drop2,
+            output_path=output_path,
+            output_path1=output_path1,
+            output_path2=output_path2
+        )
+
+        print(f"Saving CSVs as {output_path}, {output_path1}, and {output_path2}")
         compartimentizer.compartimentizer(args.compart_input_path)
 
     # RDFCreator
