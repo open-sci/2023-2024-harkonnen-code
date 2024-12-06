@@ -22,6 +22,9 @@ A repository for the systematic extraction, processing, and analysis of peer rev
 │   │  
 │   └── results/
 │
+├── img
+│
+│
 ├── scripts/
 │   ├── extraction/
 │   │   ├── PeerExtractor.py
@@ -34,6 +37,8 @@ A repository for the systematic extraction, processing, and analysis of peer rev
 │   ├── analysis/
 │   │   ├── VenueCounter.py
 │   │   └── MetaAnalysis.py
+│   ├── data_visualization/
+│   │   └──PROCI-data-visualization.ipynb
 │   └── run.py
 │
 ├── notebooks/
