@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 ![PROCI](img/PROCI.jpg "PROCI logos")
 =======
 
