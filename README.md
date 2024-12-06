@@ -1,4 +1,4 @@
-![Alt text](img\PROCI.jpg "PROCI logos")
+![PROCI](img/PROCI.jpg "PROCI logos")
 
 
 # PROCI Workflow
@@ -22,6 +22,9 @@ A repository for the systematic extraction, processing, and analysis of peer rev
 │   │  
 │   └── results/
 │
+├── img
+│
+│
 ├── scripts/
 │   ├── extraction/
 │   │   ├── PeerExtractor.py
@@ -34,6 +37,8 @@ A repository for the systematic extraction, processing, and analysis of peer rev
 │   ├── analysis/
 │   │   ├── VenueCounter.py
 │   │   └── MetaAnalysis.py
+│   ├── data_visualization/
+│   │   └──PROCI-data-visualization.ipynb
 │   └── run.py
 │
 ├── notebooks/
@@ -48,12 +53,13 @@ A repository for the systematic extraction, processing, and analysis of peer rev
 
 ## Abstract
 
-This repository provides a step-by-step methodology for extracting, aligning, and analyzing peer review data from Crossref, aimed at enhancing the OpenCitations Index. The workflow encompasses four phases:
+This repository provides a step-by-step methodology for extracting, aligning, and analyzing peer review data from Crossref, aimed at enhancing the OpenCitations Index. The workflow encompasses five phases:
 
 1. **Data Gathering**
 2. **Data Processing**
 3. **Post-Processing**
-4. **Data Analysis and Visualization**
+4. **Data Analysis** 
+5. **Visualization**
 
 The workflow addresses key research questions about citation dynamics and peer review coverage in scholarly metadata.
 
@@ -94,14 +100,14 @@ Extract data from the Crossref dump:
 
 Peer Reviews:
 
-    ```sh
-        python run.py PeerExtractor <path_to_zip> <output_csv>
-    ```
+
+    python run.py PeerExtractor <path_to_zip> <output_csv>
+
 Non-Peer Reviews:
 
-    ```sh
-        python run.py NonPeerExtractor <path_to_zip> <output_csv>
-    ```
+    
+    python run.py NonPeerExtractor <path_to_zip> <output_csv>
+    
 2. **Data Processing**:
 
 Combine datasets and calculate temporal deltas:
