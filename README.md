@@ -41,8 +41,6 @@ A repository for the systematic extraction, processing, and analysis of peer rev
 │   │   └──PROCI-data-visualization.ipynb
 │   └── run.py
 │
-├── notebooks/
-│   └── workflow.ipynb
 │
 ├── requirements.txt
 ├── README.md
