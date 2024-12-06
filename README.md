@@ -1,3 +1,6 @@
+![Alt text](img\PROCI.jpg "PROCI logos")
+
+
 # PROCI Workflow
 
 A repository for the systematic extraction, processing, and analysis of peer review data from Crossref to create a novel citation index compliant with the OpenCitations Data Model.
