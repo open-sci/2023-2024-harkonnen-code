@@ -1,4 +1,4 @@
-![Alt text](img\PROCI.jpg "PROCI logos")
+![Alt text](img/PROCI.jpg "PROCI logos")
 
 
 # PROCI Workflow
