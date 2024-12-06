@@ -74,9 +74,8 @@ The workflow addresses key research questions about citation dynamics and peer r
    cd 2023-2024-harkonnen-code/
 
 3. **Install Dependencies**:
-    ```sh
-        pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
     
 4. **Prepare Data: Download the datasets**:
     - Crossref: Crossref Dump (185GB, April 2023) 
@@ -94,53 +93,44 @@ Extract data from the Crossref dump:
 
 Peer Reviews:
 
-    ```sh
-        python run.py PeerExtractor <path_to_zip> <output_csv>
-    ```
+    python run.py PeerExtractor <path_to_zip> <output_csv>
+
 Non-Peer Reviews:
 
-    ```sh
-        python run.py NonPeerExtractor <path_to_zip> <output_csv>
-    ```
+    python run.py NonPeerExtractor <path_to_zip> <output_csv>
+    
 2. **Data Processing**:
 
 Combine datasets and calculate temporal deltas:
 
-    ```sh
-        python run.py FilterJoinDeltaDir \
-        --filter_peer_review_dir <peer_dir> \
-        --filter_non_peer_review_dir <non_peer_dir> \
-        --filter_output_path <output_csv>
-    ```
+    python run.py FilterJoinDeltaDir \
+    --filter_peer_review_dir <peer_dir> \
+    --filter_non_peer_review_dir <non_peer_dir> \
+    --filter_output_path <output_csv>
+    
 3. **Post-Processing**:
 
 Split Data into Separate CSVs:
 
-    ```sh
-        python run.py Compartimentizer <input_csv>
-    ```
+    python run.py Compartimentizer <input_csv>
+    
 Generate RDF:
 
-    ```sh
-        python run.py RDF \
-        --rdf_input <input_csv> \
-        --rdf_output <output_file> \
-        --rdf_baseurl <base_url> \
-        --rdf_populate_data
-    ```
+    python run.py RDF \
+    --rdf_input <input_csv> \
+    --rdf_output <output_file> \
+    --rdf_baseurl <base_url> \
+    --rdf_populate_data
+    
 4. **Data Analysis and Visualization**:
 
 Analyze Top Venues:
 
-    ```sh
     python run.py Venue <input_csv> --venue_output_file <output_csv>
-    ```
+
 Cross-Reference Data with OpenCitations Meta:
 
-    ```sh
-        python run.py Meta <combined_csv> <meta_zip_file> --meta_mode all --meta_output_file <output_csv>
-    ```
----
+    python run.py Meta <combined_csv> <meta_zip_file> --meta_mode all --meta_output_file <output_csv>
 
 **Research Questions**:
 
