@@ -91,7 +91,7 @@ class PeerReview(object):
         return date is not None and len(date) >= 10
 
 def populate_data(csv_file, output_file, base_url, include_data=True, include_prov=False):
-    with open(csv_file, 'r') as file:
+    with open(csv_file, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file, delimiter=',')
         for row in reader:
             oci = row['oci']
@@ -113,7 +113,7 @@ def populate_data(csv_file, output_file, base_url, include_data=True, include_pr
 
 def populate_prov(csv_file, output_file, base_url, include_data=False, include_prov=True):
     block_txt = ''
-    with open(csv_file, 'r') as file:
+    with open(csv_file, mode='r', encoding='utf-8') as file:
         reader = csv.DictReader(file, delimiter=',')
         for row in reader:
             oci = row['oci']
@@ -132,34 +132,3 @@ def populate_prov(csv_file, output_file, base_url, include_data=False, include_p
     if block_txt:
         with open(output_file, 'a', newline='') as f:
             f.write(block_txt)
-
-def main():
-    parser = argparse.ArgumentParser(description='Process some integers.')
-    parser.add_argument('--rdf_input', type=str, help='Input CSV file', required=True)
-    parser.add_argument('--rdf_baseurl', type=str, help='Base URL', required=True)
-    parser.add_argument('--output_dir', help='Directory to save the output file', default="data/processed/analysis")
-    parser.add_argument('--rdf_data', dest='include_data', action='store_true', help='Include data')
-    parser.add_argument('--rdf_prov', dest='include_prov', action='store_true', help='Include provenance')
-    parser.add_argument('--rdf_populate_data', dest='populate_data', action='store_true', help='Populate data')
-    parser.add_argument('--rdf_populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
-
-    args = parser.parse_args()
-
-    # Assicurati che la directory di output esista
-    if not os.path.exists(args.output_dir):
-        os.makedirs(args.output_dir)
-
-    # Genera un percorso di output predefinito
-    input_basename = os.path.splitext(os.path.basename(args.rdf_input))[0]
-    output_filename = f"{input_basename}_rdf.nt"
-    output_path = os.path.join(args.output_dir, output_filename)
-
-    if args.populate_data:
-        populate_data(args.rdf_input, output_path, args.rdf_baseurl, include_data=args.include_data, include_prov=False)
-    elif args.populate_prov:
-        populate_prov(args.rdf_input, output_path, args.rdf_baseurl, include_data=args.include_data, include_prov=args.include_prov)
-    else:
-        print("No action specified. Use --rdf_populate_data or --rdf_populate_prov.")
-
-if __name__ == "__main__":
-    main()

@@ -24,7 +24,6 @@ from post_processing.RDFcreator import PeerReview, populate_data, populate_prov
 from analysis.VenueCounter import VenueCounter
 from analysis.MetaAnalysis import MetaAnalysis
 
-# Example of usage?
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Main program")
@@ -61,25 +60,25 @@ def parse_args():
     # RDFcreator -- parameters
     rdf_parser = subparsers.add_parser("RDF", help="Process some integers.")
     rdf_parser.add_argument('--rdf_input', type=str, help='Input CSV file', required=True)
-    rdf_parser.add_argument('--rdf_output', type=str, help='Output file', required=True)
+    rdf_parser.add_argument('--rdf_output', type=str, help='Output file', default="../data/processed/rdf/default_rdf_output.ttl")
     rdf_parser.add_argument('--rdf_baseurl', type=str, help='Base URL', required=True)
-    rdf_parser.add_argument('--rdf_data', dest='include_data', action='store_true', help='Include data')
-    rdf_parser.add_argument('--rdf_prov', dest='include_prov', action='store_true', help='Include provenance')
-    rdf_parser.add_argument('--rdf_populate_data', dest='populate_data', action='store_true', help='Populate data')
-    rdf_parser.add_argument('--rdf_populate_prov', dest='populate_prov', action='store_true', help='Populate provenance')
+    rdf_parser.add_argument('--rdf_data', dest='rdf_include_data', action='store_true', help='Include data')
+    rdf_parser.add_argument('--rdf_prov', dest='rdf_include_prov', action='store_true', help='Include provenance')
+    rdf_parser.add_argument('--rdf_populate_data', dest='rdf_populate_data', action='store_true', help='Populate data')
+    rdf_parser.add_argument('--rdf_populate_prov', dest='rdf_populate_prov', action='store_true', help='Populate provenance')
     
     # VenueCounter -- parameters
     venue_parser = subparsers.add_parser("Venue", help="Path to the input CSV file")
     venue_parser.add_argument('venue_csv_file', help='Path to the input CSV file')
     venue_parser.add_argument('--venue_top_n', type=int, default=10, help='Number of top venues to display')
-    venue_parser.add_argument('--venue_output_file', help='Path to the output CSV file to save results')
+    venue_parser.add_argument('--venue_output_file', help='Path to the output CSV file to save results', default="../data/processed/venue_counts/top_venues.csv")
 
     # MetaAnalysis -- parameters
     meta_parser = subparsers.add_parser("Meta", help="Meta Analysis")
     meta_parser.add_argument('meta_combined_csv', help='Path to the combined CSV file')
-    meta_parser.add_argument('meta_zip_file', help='Path to the OpenAlex zip file')
+    meta_parser.add_argument('meta_zip_file', help='Path to the OpenCitations Meta zip file')
     meta_parser.add_argument('--meta_mode', choices=['peer', 'article', 'all'], default='all', help='Mode of operation')
-    meta_parser.add_argument('--meta_output_file', help='Path to the output CSV file to save counts')
+    meta_parser.add_argument('--meta_output_file', help='Path to the output CSV file to save counts', default="../data/processed/meta_comparison/meta_counts.csv")
 
     args = parser.parse_args()
     return args
@@ -161,27 +160,63 @@ def main():
         compartimentizer.compartimentizer(args.compart_input_path)
 
     # RDFCreator
+    # RDFCreator
     if args.command == "RDF":
+        # Creazione directory di output
+        default_output_dir = "../data/processed/rdf"
+        os.makedirs(default_output_dir, exist_ok=True)
+        
+        # Costruzione del percorso di output predefinito
+        input_basename = os.path.splitext(os.path.basename(args.rdf_input))[0]
+        rdf_output_file = args.rdf_output or os.path.join(
+            default_output_dir, f"{input_basename}_rdf_output.ttl"
+        )
+        
+        # Esecuzione del processo RDF
         if args.rdf_populate_data:
-            populate_data(args.rdf_input, args.rdf_output, args.rdf_baseurl, include_data=args.rdf_include_data, include_prov=False)
+            populate_data(args.rdf_input, rdf_output_file, args.rdf_baseurl, include_data=args.rdf_include_data, include_prov=False)
         elif args.rdf_populate_prov:
-            populate_prov(args.rdf_input, args.rdf_output, args.rdf_baseurl, include_data=args.rdf_include_data, include_prov=args.rdf_include_prov)
+            populate_prov(args.rdf_input, rdf_output_file, args.rdf_baseurl, include_data=args.rdf_include_data, include_prov=args.rdf_include_prov)
         else:
-            print("No action specified. Use --populate_data or --populate_prov.")
+            print("No action specified. Use --rdf_populate_data or --rdf_populate_prov.")
+
+        print(f"RDF file saved in {rdf_output_file}")
 
     # VenueCounter
     if args.command == "Venue":
+        # Creazione directory di output
+        default_output_dir = "../data/processed/venue_counts"
+        os.makedirs(default_output_dir, exist_ok=True)
+        
+        # Costruzione del percorso di output predefinito
+        input_basename = os.path.splitext(os.path.basename(args.venue_csv_file))[0]
+        venue_output_file = args.venue_output_file or os.path.join(
+            default_output_dir, f"{input_basename}_top_venues.csv"
+        )
+        
+        # Esecuzione dell'analisi
         counter = VenueCounter(args.venue_csv_file)
         top_venues = counter.get_top_venues(args.venue_top_n)
         print(f"Top {args.venue_top_n} venues:")
         print(top_venues)
 
-        if args.venue_output_file:
-            counter.save_to_csv(args.venue_output_file)
+        # Salvataggio dei risultati
+        counter.save_to_csv(venue_output_file)
+        print(f"Results saved in {venue_output_file}")
 
     # MetaAnalysis
     if args.command == "Meta":
+        # Creazione directory di output
+        default_output_dir = "../data/processed/meta_comparison"
+        os.makedirs(default_output_dir, exist_ok=True)
         
+        # Costruzione del percorso di output predefinito
+        input_basename = os.path.splitext(os.path.basename(args.meta_combined_csv))[0]
+        meta_output_file = args.meta_output_file or os.path.join(
+            default_output_dir, f"{input_basename}_meta_counts.csv"
+        )
+        
+        # Esecuzione dell'analisi
         analysis = MetaAnalysis(args.meta_combined_csv)
 
         peer_count = article_count = None
@@ -192,8 +227,9 @@ def main():
             article_count = analysis.get_article_count(args.meta_zip_file)
             print(f"Number of articles: {article_count}")
 
-        if args.output_file:
-            analysis.save_counts_to_csv(args.meta_output_file, peer_count, article_count)
+        # Salvataggio dei risultati
+        analysis.save_counts_to_csv(meta_output_file, peer_count, article_count)
+        print(f"Results saved in {meta_output_file}")
 
 
 if __name__ == '__main__':
