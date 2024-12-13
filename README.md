@@ -156,7 +156,7 @@ Cross-Reference Data with OpenCitations Meta:
   - Provenance
   - Venues
 - RDF:
-  - Serialized triples in N-Triples format
+  - Serialized triples in Turtle format
 
 **Visualizations**:
 - Bar charts, donut charts, and line graphs for citation statistics and dynamics.
