@@ -127,8 +127,8 @@ def populate_prov(csv_file, output_file, base_url, include_data=False, include_p
                                   prov_date=prov_date)
 
             g = citation.get_peer_review_rdf(base_url, include_data=include_data, include_prov=include_prov)
-            block_txt += g.serialize(format='nt')
+            block_txt += g.serialize(format='turtle')
 
     if block_txt:
-        with open(output_file, 'a', newline='') as f:
+        with open(output_file, 'a', newline='',  encoding='utf-8') as f:
             f.write(block_txt)
